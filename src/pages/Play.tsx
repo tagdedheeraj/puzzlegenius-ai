@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, RefreshCw, Lightbulb, Clock, Trophy, Sparkles, Brain, BarChart } from "lucide-react";
@@ -10,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGame } from "@/contexts/GameContext";
 import { PuzzleType } from "@/lib/puzzleGenerator";
 import { Separator } from "@/components/ui/separator";
+import BannerAd from "@/components/ads/BannerAd";
+import { useInterstitialAd } from "@/hooks/useInterstitialAd";
 
 const puzzleTypes: { value: PuzzleType; label: string; icon: any }[] = [
   { value: "pattern", label: "Number Patterns", icon: Trophy },
@@ -40,15 +41,14 @@ const Play = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   
-  // Generate puzzle on mount if none exists
+  const { showAd, shouldShowAd } = useInterstitialAd();
+  
   useEffect(() => {
     if (!puzzle) {
       generateNewPuzzle(selectedTab);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
-  // Focus first input when puzzle loads
   useEffect(() => {
     if (puzzle && !isLoading && inputRefs.current[0]) {
       setTimeout(() => {
@@ -57,7 +57,6 @@ const Play = () => {
     }
   }, [puzzle, isLoading]);
   
-  // Timer functionality
   useEffect(() => {
     let interval: number | undefined;
     
@@ -72,7 +71,6 @@ const Play = () => {
     };
   }, [puzzle, isLoading, timerActive]);
   
-  // Start timer when puzzle is loaded
   useEffect(() => {
     if (puzzle && !isLoading) {
       setTimer(0);
@@ -87,7 +85,7 @@ const Play = () => {
     generateNewPuzzle(value as PuzzleType);
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!puzzle || isSubmitting) return;
@@ -99,6 +97,12 @@ const Play = () => {
     
     if (success) {
       setShowExplanation(true);
+      
+      if (shouldShowAd()) {
+        setTimeout(async () => {
+          await showAd();
+        }, 500);
+      }
     }
     
     setTimeout(() => {
@@ -118,7 +122,6 @@ const Play = () => {
   const handleInputChange = (index: number, value: string) => {
     setPlayerAnswer(index, value);
     
-    // Auto-advance to next input if this one is filled
     if (value && inputRefs.current[index + 1]) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -138,7 +141,6 @@ const Play = () => {
     }
   };
 
-  // Get icon for current puzzle type
   const getPuzzleIcon = () => {
     const puzzleType = puzzleTypes.find(type => type.value === (puzzle?.type || selectedTab));
     const Icon = puzzleType?.icon || Brain;
@@ -153,6 +155,8 @@ const Play = () => {
           Solve the puzzle by finding the correct answer. Choose a puzzle type below.
         </p>
       </div>
+      
+      <BannerAd className="mb-6" />
       
       <Tabs value={selectedTab} onValueChange={handleTabChange} className="mb-6">
         <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-6 w-full bg-card/50 p-1 rounded-xl">
@@ -315,6 +319,8 @@ const Play = () => {
           </TabsContent>
         ))}
       </Tabs>
+      
+      <BannerAd className="mt-6" />
     </div>
   );
 };
