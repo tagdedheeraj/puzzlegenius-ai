@@ -3,6 +3,7 @@ import React from "react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Award, Medal } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type LeaderboardEntry = {
   rank: number;
@@ -35,6 +36,8 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   data = sampleLeaderboardData,
   userRank,
 }) => {
+  const isMobile = useIsMobile();
+
   // Function to render rank badge
   const renderRankBadge = (rank: number) => {
     if (rank === 1) {
@@ -60,8 +63,12 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                 <TableHead className="w-[80px]">Rank</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead className="text-right">Score</TableHead>
-                <TableHead className="text-right">Puzzles</TableHead>
-                <TableHead className="text-right">Best Streak</TableHead>
+                {!isMobile && (
+                  <>
+                    <TableHead className="text-right">Puzzles</TableHead>
+                    <TableHead className="text-right">Best Streak</TableHead>
+                  </>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -75,10 +82,14 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                       {renderRankBadge(entry.rank)}
                     </div>
                   </TableCell>
-                  <TableCell>{entry.name}</TableCell>
+                  <TableCell className="max-w-[120px] truncate">{entry.name}</TableCell>
                   <TableCell className="text-right font-semibold">{entry.score}</TableCell>
-                  <TableCell className="text-right">{entry.puzzlesSolved}</TableCell>
-                  <TableCell className="text-right">{entry.bestStreak}</TableCell>
+                  {!isMobile && (
+                    <>
+                      <TableCell className="text-right">{entry.puzzlesSolved}</TableCell>
+                      <TableCell className="text-right">{entry.bestStreak}</TableCell>
+                    </>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
