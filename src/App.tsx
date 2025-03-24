@@ -12,14 +12,22 @@ import Tutorial from "./pages/Tutorial";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+// Create React Query client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <GameProvider>
         <Toaster />
-        <Sonner />
+        <Sonner position="top-center" closeButton theme="dark" />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout />}>

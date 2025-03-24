@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Brain, Settings, BookOpen, Menu, X } from "lucide-react";
+import { Home, Brain, Settings, BookOpen, Menu, X, Trophy, User, Sparkles, BarChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/contexts/GameContext";
 import { cn } from "@/lib/utils";
@@ -24,10 +24,17 @@ const Layout = () => {
     { path: "/settings", icon: Settings, label: "Settings" },
   ];
 
+  const bottomNavItems = [
+    { path: "/", icon: Home, label: "Home" },
+    { path: "/play", icon: Brain, label: "Play" },
+    { path: "/tutorial", icon: BookOpen, label: "Learn" },
+    { path: "/settings", icon: Settings, label: "Settings" },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background hexagon-bg">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border">
+      <header className="sticky top-0 z-50 w-full bg-card/80 backdrop-blur-md border-b border-border">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <motion.div
@@ -36,8 +43,10 @@ const Layout = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <Brain className="h-6 w-6 text-primary" />
-              <span className="ml-2 text-xl font-semibold">PuzzleGenius</span>
+              <Brain className="h-7 w-7 text-primary glow" />
+              <span className="ml-2 text-xl font-bold tracking-wide glow-text">
+                PuzzleGenius
+              </span>
             </motion.div>
           </div>
           
@@ -50,8 +59,8 @@ const Layout = () => {
                 className={({ isActive }) => cn(
                   "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
                   isActive 
-                    ? "text-primary bg-primary/10" 
-                    : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                    ? "text-primary bg-secondary" 
+                    : "text-foreground/70 hover:text-foreground hover:bg-secondary/50"
                 )}
               >
                 <item.icon className="h-4 w-4 mr-2" />
@@ -91,8 +100,8 @@ const Layout = () => {
                     className={({ isActive }) => cn(
                       "flex items-center py-3 px-4 text-base font-medium rounded-lg transition-colors",
                       isActive 
-                        ? "text-primary bg-primary/10" 
-                        : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                        ? "text-primary bg-secondary" 
+                        : "text-foreground/70 hover:text-foreground hover:bg-secondary/50"
                     )}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -106,19 +115,19 @@ const Layout = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="glass-card p-3 rounded-lg">
                     <p className="text-xs text-muted-foreground">Score</p>
-                    <p className="text-xl font-semibold">{score}</p>
+                    <p className="text-xl font-semibold text-primary glow-text">{score}</p>
                   </div>
                   <div className="glass-card p-3 rounded-lg">
                     <p className="text-xs text-muted-foreground">Level</p>
-                    <p className="text-xl font-semibold">{level}</p>
+                    <p className="text-xl font-semibold text-primary glow-text">{level}</p>
                   </div>
                   <div className="glass-card p-3 rounded-lg">
                     <p className="text-xs text-muted-foreground">Solved</p>
-                    <p className="text-xl font-semibold">{completedPuzzles}</p>
+                    <p className="text-xl font-semibold text-primary glow-text">{completedPuzzles}</p>
                   </div>
                   <div className="glass-card p-3 rounded-lg">
                     <p className="text-xs text-muted-foreground">Streak</p>
-                    <p className="text-xl font-semibold">{streakCount}</p>
+                    <p className="text-xl font-semibold text-primary glow-text">{streakCount}</p>
                   </div>
                 </div>
               </div>
@@ -128,31 +137,35 @@ const Layout = () => {
       </AnimatePresence>
 
       {/* Stats bar - desktop only */}
-      <div className="hidden md:block border-b border-border bg-background/50 backdrop-blur-sm">
+      <div className="hidden md:block border-b border-border bg-card/50 backdrop-blur-sm">
         <div className="container py-2">
           <div className="flex justify-center space-x-8">
             <div className="flex items-center">
-              <span className="text-sm font-medium text-muted-foreground mr-2">Score:</span>
-              <span className="text-sm font-semibold">{score}</span>
+              <Trophy className="h-4 w-4 text-yellow-500 mr-2" />
+              <span className="text-sm font-medium text-muted-foreground mr-1">Score:</span>
+              <span className="text-sm font-semibold text-primary">{score}</span>
             </div>
             <div className="flex items-center">
-              <span className="text-sm font-medium text-muted-foreground mr-2">Level:</span>
-              <span className="text-sm font-semibold">{level}</span>
+              <Sparkles className="h-4 w-4 text-blue-500 mr-2" />
+              <span className="text-sm font-medium text-muted-foreground mr-1">Level:</span>
+              <span className="text-sm font-semibold text-primary">{level}</span>
             </div>
             <div className="flex items-center">
-              <span className="text-sm font-medium text-muted-foreground mr-2">Puzzles Solved:</span>
-              <span className="text-sm font-semibold">{completedPuzzles}</span>
+              <Brain className="h-4 w-4 text-green-500 mr-2" />
+              <span className="text-sm font-medium text-muted-foreground mr-1">Solved:</span>
+              <span className="text-sm font-semibold text-primary">{completedPuzzles}</span>
             </div>
             <div className="flex items-center">
-              <span className="text-sm font-medium text-muted-foreground mr-2">Streak:</span>
-              <span className="text-sm font-semibold">{streakCount}</span>
+              <BarChart className="h-4 w-4 text-purple-500 mr-2" />
+              <span className="text-sm font-medium text-muted-foreground mr-1">Streak:</span>
+              <span className="text-sm font-semibold text-primary">{streakCount}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 container py-6 md:py-8">
+      <main className="flex-1 container py-6 md:py-8 pb-20 md:pb-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -167,8 +180,30 @@ const Layout = () => {
         </AnimatePresence>
       </main>
 
+      {/* Bottom Navigation Bar (Mobile) */}
+      <div className="bottom-bar flex justify-around items-center md:hidden">
+        {bottomNavItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) => cn(
+              "flex flex-col items-center justify-center py-1",
+              isActive ? "text-primary" : "text-muted-foreground"
+            )}
+          >
+            <div className={cn(
+              "p-1.5 rounded-full", 
+              { "bg-secondary": location.pathname === item.path }
+            )}>
+              <item.icon className="h-5 w-5" />
+            </div>
+            <span className="text-xs mt-1">{item.label}</span>
+          </NavLink>
+        ))}
+      </div>
+
       {/* Footer */}
-      <footer className="py-4 text-center text-sm text-muted-foreground border-t border-border bg-background/50 backdrop-blur-sm">
+      <footer className="py-4 text-center text-sm text-muted-foreground border-t border-border bg-card/50 backdrop-blur-sm hidden md:block">
         <div className="container">
           <p>© {new Date().getFullYear()} PuzzleGenius AI</p>
         </div>

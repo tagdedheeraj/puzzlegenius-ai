@@ -109,6 +109,10 @@ export default {
 				'rotate-slow': {
 					'0%': { transform: 'rotate(0deg)' },
 					'100%': { transform: 'rotate(360deg)' }
+				},
+				'shimmer': {
+					'0%': { backgroundPosition: '100% 0' },
+					'100%': { backgroundPosition: '-100% 0' }
 				}
 			},
 			animation: {
@@ -121,15 +125,16 @@ export default {
 				'slide-in': 'slide-in 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
 				'pulse-soft': 'pulse-soft 2s infinite ease-in-out',
 				'float': 'float 6s infinite ease-in-out',
-				'rotate-slow': 'rotate-slow 12s linear infinite'
+				'rotate-slow': 'rotate-slow 12s linear infinite',
+				'shimmer': 'shimmer 3s infinite'
 			},
 			fontFamily: {
-				sans: ['Inter', 'sans-serif'],
+				sans: ['Exo 2', 'Inter', 'sans-serif'],
 			},
 			boxShadow: {
-				'soft': '0 2px 10px rgba(0, 0, 0, 0.05)',
-				'glass': '0 8px 32px rgba(0, 0, 0, 0.08)',
-				'neumorph': '8px 8px 16px #e6e6e6, -8px -8px 16px #ffffff'
+				'soft': '0 2px 10px rgba(0, 0, 0, 0.1)',
+				'glass': '0 8px 32px rgba(0, 0, 0, 0.2)',
+				'neumorph': '8px 8px 16px rgba(0, 0, 0, 0.2), -8px -8px 16px rgba(255, 255, 255, 0.05)'
 			},
 			backdropFilter: {
 				'none': 'none',
