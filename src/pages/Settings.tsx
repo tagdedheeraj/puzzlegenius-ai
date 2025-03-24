@@ -1,7 +1,7 @@
-
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Volume2, VolumeX, RefreshCw, Award } from "lucide-react";
+import { Volume2, VolumeX, RefreshCw, Award, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -193,11 +193,17 @@ const Settings = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                   PuzzleGenius is an AI-powered puzzle game that generates unique challenges to test
                   your pattern recognition, logical reasoning, and problem-solving skills. 
                   Each puzzle is dynamically created to provide a fresh experience every time.
                 </p>
+                <Button asChild variant="outline" size="sm" className="w-full mt-2 flex items-center gap-2">
+                  <Link to="/privacy-policy">
+                    <Shield className="h-4 w-4" />
+                    Privacy Policy
+                  </Link>
+                </Button>
               </CardContent>
               <CardFooter className="flex justify-between">
                 <p className="text-sm text-muted-foreground">Version 1.0.0</p>
