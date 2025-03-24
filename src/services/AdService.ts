@@ -14,6 +14,26 @@ const AD_CONFIG = {
 // Variable to track if the ad scripts are loaded
 let adsInitialized = false;
 
+// Define the googletag interface more safely
+interface GoogleTagInterface {
+  cmd: Array<() => void>;
+  pubads: () => {
+    setTargeting: (key: string, value: string) => void;
+    enableSingleRequest: () => void;
+    addEventListener: (event: string, listener: any) => void;
+  };
+  enableServices: () => void;
+  defineSlot: (adUnitPath: string, size: number[][], elementId: string) => any;
+  display: (elementId: string) => void;
+}
+
+// Declare the googletag property without conflicting with existing declarations
+declare global {
+  interface Window {
+    googletag?: GoogleTagInterface;
+  }
+}
+
 /**
  * Initialize Google Ad services
  */
@@ -56,7 +76,7 @@ export const initializeAds = (): Promise<void> => {
  * Display a banner ad in the specified container
  */
 export const showBanner = (containerId: string): void => {
-  if (!adsInitialized) {
+  if (!adsInitialized || !window.googletag) {
     console.warn('Ads not initialized yet. Call initializeAds() first.');
     return;
   }
@@ -83,7 +103,7 @@ export const showBanner = (containerId: string): void => {
  */
 export const showInterstitial = (): Promise<boolean> => {
   return new Promise((resolve) => {
-    if (!adsInitialized) {
+    if (!adsInitialized || !window.googletag) {
       console.warn('Ads not initialized yet. Call initializeAds() first.');
       resolve(false);
       return;
@@ -134,20 +154,3 @@ export const showInterstitial = (): Promise<boolean> => {
     });
   });
 };
-
-// Add TypeScript declarations for Google Publisher Tags
-declare global {
-  interface Window {
-    googletag: {
-      cmd: Array<() => void>;
-      pubads: () => {
-        setTargeting: (key: string, value: string) => void;
-        enableSingleRequest: () => void;
-        addEventListener: (event: string, listener: any) => void;
-      };
-      enableServices: () => void;
-      defineSlot: (adUnitPath: string, size: number[][], elementId: string) => any;
-      display: (elementId: string) => void;
-    };
-  }
-}
