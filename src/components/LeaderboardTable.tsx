@@ -4,8 +4,9 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Award, Medal } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Skeleton } from "@/components/ui/skeleton";
 
-type LeaderboardEntry = {
+export type LeaderboardEntry = {
   rank: number;
   name: string;
   score: number;
@@ -30,11 +31,13 @@ const sampleLeaderboardData: LeaderboardEntry[] = [
 interface LeaderboardTableProps {
   data?: LeaderboardEntry[];
   userRank?: number | null;
+  isLoading?: boolean;
 }
 
 const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   data = sampleLeaderboardData,
   userRank,
+  isLoading = false
 }) => {
   const isMobile = useIsMobile();
 
@@ -49,6 +52,27 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
     }
     return rank;
   };
+
+  if (isLoading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-center text-xl md:text-2xl">Top Players</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {Array(5).fill(0).map((_, i) => (
+              <div key={i} className="flex items-center space-x-2">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-6 w-16 ml-auto" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full">
@@ -72,26 +96,34 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((entry, index) => (
-                <TableRow 
-                  key={index}
-                  className={userRank === entry.rank ? "bg-primary/20" : ""}
-                >
-                  <TableCell className="font-medium">
-                    <div className="flex items-center justify-center">
-                      {renderRankBadge(entry.rank)}
-                    </div>
+              {data.length > 0 ? (
+                data.map((entry, index) => (
+                  <TableRow 
+                    key={index}
+                    className={userRank === entry.rank ? "bg-primary/20" : ""}
+                  >
+                    <TableCell className="font-medium">
+                      <div className="flex items-center justify-center">
+                        {renderRankBadge(entry.rank)}
+                      </div>
+                    </TableCell>
+                    <TableCell className="max-w-[120px] truncate">{entry.name}</TableCell>
+                    <TableCell className="text-right font-semibold">{entry.score}</TableCell>
+                    {!isMobile && (
+                      <>
+                        <TableCell className="text-right">{entry.puzzlesSolved}</TableCell>
+                        <TableCell className="text-right">{entry.bestStreak}</TableCell>
+                      </>
+                    )}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={isMobile ? 3 : 5} className="text-center py-6 text-muted-foreground">
+                    No leaderboard data available yet
                   </TableCell>
-                  <TableCell className="max-w-[120px] truncate">{entry.name}</TableCell>
-                  <TableCell className="text-right font-semibold">{entry.score}</TableCell>
-                  {!isMobile && (
-                    <>
-                      <TableCell className="text-right">{entry.puzzlesSolved}</TableCell>
-                      <TableCell className="text-right">{entry.bestStreak}</TableCell>
-                    </>
-                  )}
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </div>

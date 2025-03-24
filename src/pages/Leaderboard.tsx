@@ -1,133 +1,156 @@
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious 
-} from "@/components/ui/pagination";
+import { useState, useEffect } from "react";
+import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
+import { db } from "@/services/FirebaseService";
 import LeaderboardTable from "@/components/LeaderboardTable";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useGame } from "@/contexts/GameContext";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { toast } from "sonner";
+
+// Define leaderboard entry type
+export type LeaderboardEntry = {
+  rank: number;
+  name: string;
+  score: number;
+  puzzlesSolved: number;
+  bestStreak: number;
+};
 
 const Leaderboard = () => {
   const { score, completedPuzzles, streakCount } = useGame();
-  const [currentTab, setCurrentTab] = useState("global");
-  const [currentPage, setCurrentPage] = useState(1);
-  const isMobile = useIsMobile();
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const [userRank, setUserRank] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
-  // This is where you would fetch real leaderboard data in a production app
-  // For now we're using the sample data in the LeaderboardTable component
+  // Fetch leaderboard data from Firestore
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        setIsLoading(true);
+        const leaderboardRef = collection(db, "leaderboard");
+        const leaderboardQuery = query(
+          leaderboardRef, 
+          orderBy("score", "desc"), 
+          limit(pageSize * page)
+        );
+        
+        const snapshot = await getDocs(leaderboardQuery);
+        
+        if (snapshot.empty) {
+          // If no data in Firebase yet, use sample data
+          setLeaderboardData([]);
+          setIsLoading(false);
+          return;
+        }
+        
+        const leaderboardEntries: LeaderboardEntry[] = snapshot.docs.map((doc, index) => {
+          const data = doc.data();
+          return {
+            rank: index + 1,
+            name: data.name || "Unknown Player",
+            score: data.score || 0,
+            puzzlesSolved: data.puzzlesSolved || 0,
+            bestStreak: data.bestStreak || 0,
+          };
+        });
+        
+        setLeaderboardData(leaderboardEntries);
+        
+        // Check if current user is in leaderboard
+        const userScore = score;
+        if (userScore > 0) {
+          const userRankIndex = leaderboardEntries.findIndex(entry => 
+            entry.score < userScore
+          );
+          
+          if (userRankIndex !== -1) {
+            setUserRank(userRankIndex + 1);
+          } else {
+            setUserRank(leaderboardEntries.length + 1);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching leaderboard data:", error);
+        toast.error("Failed to load leaderboard data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // Calculate user's position (not implemented, just mocked for UI)
-  const userRank = 42; // This would be calculated based on real data
+    fetchLeaderboard();
+  }, [page, score]);
+
+  const handleNextPage = () => {
+    setPage(prev => prev + 1);
+  };
+
+  const handlePrevPage = () => {
+    setPage(prev => Math.max(1, prev - 1));
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="container max-w-4xl mx-auto px-2 sm:px-4"
-    >
-      <h1 className="text-2xl md:text-3xl font-bold text-center mb-4 md:mb-6">Leaderboard</h1>
-      
-      <Card className="mb-4 md:mb-8">
-        <CardHeader className="p-4 md:p-6">
-          <CardTitle className="text-lg md:text-xl">Your Stats</CardTitle>
-          <CardDescription>See how you compare to other players</CardDescription>
-        </CardHeader>
-        <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
-          <div className="grid grid-cols-3 gap-2 md:gap-4">
-            <div className="glass-card p-2 md:p-4 rounded-lg text-center">
-              <p className="text-xs md:text-sm text-muted-foreground">Your Score</p>
-              <p className="text-lg md:text-2xl font-semibold text-primary glow-text">{score}</p>
+    <div className="space-y-6">
+      <div className="text-center">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">Leaderboard</h1>
+        <p className="text-muted-foreground">See how you rank against other players</p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-center text-xl">Your Stats</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-card/60 p-4 rounded-lg border">
+                <div className="text-sm text-muted-foreground">Total Score</div>
+                <div className="text-2xl font-bold text-primary">{score}</div>
+              </div>
+              <div className="bg-card/60 p-4 rounded-lg border">
+                <div className="text-sm text-muted-foreground">Global Rank</div>
+                <div className="text-2xl font-bold text-primary">{userRank || 'N/A'}</div>
+              </div>
+              <div className="bg-card/60 p-4 rounded-lg border">
+                <div className="text-sm text-muted-foreground">Puzzles Solved</div>
+                <div className="text-2xl font-bold text-primary">{completedPuzzles}</div>
+              </div>
+              <div className="bg-card/60 p-4 rounded-lg border">
+                <div className="text-sm text-muted-foreground">Best Streak</div>
+                <div className="text-2xl font-bold text-primary">{streakCount}</div>
+              </div>
             </div>
-            <div className="glass-card p-2 md:p-4 rounded-lg text-center">
-              <p className="text-xs md:text-sm text-muted-foreground">Puzzles Solved</p>
-              <p className="text-lg md:text-2xl font-semibold text-primary glow-text">{completedPuzzles}</p>
-            </div>
-            <div className="glass-card p-2 md:p-4 rounded-lg text-center">
-              <p className="text-xs md:text-sm text-muted-foreground">Best Streak</p>
-              <p className="text-lg md:text-2xl font-semibold text-primary glow-text">{streakCount}</p>
-            </div>
-          </div>
-          
-          <div className="mt-4 text-center">
-            <p className="text-sm md:text-base text-muted-foreground">
-              Your Global Rank: <span className="font-bold text-primary">{userRank}</span>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Tabs defaultValue="global" className="mb-4 md:mb-6" onValueChange={setCurrentTab}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="global">Global</TabsTrigger>
-          <TabsTrigger value="friends">Friends</TabsTrigger>
-        </TabsList>
-        <TabsContent value="global">
-          <LeaderboardTable userRank={userRank} />
-        </TabsContent>
-        <TabsContent value="friends">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-center text-lg md:text-xl">Friends Leaderboard</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center py-8 md:py-12">
-              <p className="text-sm md:text-base text-muted-foreground">Connect with friends to see their scores</p>
-              {/* This would be implemented with actual friends functionality */}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-      
-      <Pagination className="mb-4 md:mb-8">
-        <PaginationContent>
-          {!isMobile && (
-            <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} 
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-          )}
-          {[1, 2, 3].map((page) => (
-            <PaginationItem key={page}>
-              <PaginationLink 
-                isActive={page === currentPage}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          {!isMobile && (
-            <PaginationItem>
-              <PaginationNext 
-                onClick={() => setCurrentPage(Math.min(3, currentPage + 1))}
-                className={currentPage === 3 ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-          )}
-        </PaginationContent>
-      </Pagination>
-    </motion.div>
+          </CardContent>
+        </Card>
+
+        <LeaderboardTable 
+          data={leaderboardData} 
+          userRank={userRank}
+        />
+      </div>
+
+      <div className="flex justify-center space-x-2 mt-6">
+        <Button 
+          variant="outline" 
+          onClick={handlePrevPage} 
+          disabled={page === 1 || isLoading}
+          size="sm"
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+        </Button>
+        <Button 
+          variant="outline" 
+          onClick={handleNextPage} 
+          disabled={leaderboardData.length < pageSize * page || isLoading}
+          size="sm"
+        >
+          Next <ChevronRight className="h-4 w-4 ml-1" />
+        </Button>
+      </div>
+    </div>
   );
 };
 
