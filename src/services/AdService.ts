@@ -51,9 +51,14 @@ export const initializeAds = (): Promise<void> => {
     
     gptScript.onload = () => {
       // Initialize GPT
-      window.googletag = window.googletag || { cmd: [] };
+      // Fix: Initialize with empty array of functions rather than the full interface
+      if (!window.googletag) {
+        window.googletag = { cmd: [] } as GoogleTagInterface;
+      }
       
       window.googletag.cmd.push(() => {
+        if (!window.googletag) return;
+        
         // Set page-level targeting
         window.googletag.pubads().setTargeting('app', 'AIzzle');
         
@@ -82,6 +87,8 @@ export const showBanner = (containerId: string): void => {
   }
   
   window.googletag.cmd.push(() => {
+    if (!window.googletag) return;
+    
     // Define the ad slot
     const adSlot = window.googletag.defineSlot(
       AD_CONFIG.bannerAdId,
@@ -125,6 +132,12 @@ export const showInterstitial = (): Promise<boolean> => {
     document.body.appendChild(interstitialContainer);
     
     window.googletag.cmd.push(() => {
+      if (!window.googletag) {
+        document.body.removeChild(interstitialContainer);
+        resolve(false);
+        return;
+      }
+      
       const adSlot = window.googletag.defineSlot(
         AD_CONFIG.interstitialAdId,
         [[300, 250], [320, 480]], // Common interstitial sizes
