@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,6 +20,7 @@ const Layout = () => {
   const navItems = [
     { path: "/", icon: Home, label: "Home" },
     { path: "/play", icon: Brain, label: "Play" },
+    { path: "/leaderboard", icon: Trophy, label: "Leaderboard" },
     { path: "/tutorial", icon: BookOpen, label: "How to Play" },
     { path: "/settings", icon: Settings, label: "Settings" },
   ];
@@ -28,7 +28,7 @@ const Layout = () => {
   const bottomNavItems = [
     { path: "/", icon: Home, label: "Home" },
     { path: "/play", icon: Brain, label: "Play" },
-    { path: "/tutorial", icon: BookOpen, label: "Learn" },
+    { path: "/leaderboard", icon: Trophy, label: "Ranks" },
     { path: "/settings", icon: Settings, label: "Settings" },
   ];
 

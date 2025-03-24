@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import Play from "./pages/Play";
 import Tutorial from "./pages/Tutorial";
 import Settings from "./pages/Settings";
+import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 
 // Create React Query client
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="play" element={<Play />} />
               <Route path="tutorial" element={<Tutorial />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="leaderboard" element={<Leaderboard />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
