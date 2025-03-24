@@ -45,10 +45,10 @@ const Home = () => {
         </div>
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
           Challenge Your Mind with
-          <span className="text-primary block md:inline"> PuzzleGenius AI</span>
+          <span className="text-primary block md:inline"> AIzzle</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          PuzzleGenius creates unique, AI-generated puzzles that adapt to your skill level.
+          AIzzle creates unique, AI-generated puzzles that adapt to your skill level.
           Solve patterns, sequences, logic problems, and word puzzles to train your brain.
         </p>
       </motion.div>

@@ -6,6 +6,7 @@ import { Home, Brain, Settings, BookOpen, Menu, X, Trophy, User, Sparkles, BarCh
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/contexts/GameContext";
 import { cn } from "@/lib/utils";
+import Logo from "./Logo";
 
 const Layout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -43,10 +44,7 @@ const Layout = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <Brain className="h-7 w-7 text-primary glow" />
-              <span className="ml-2 text-xl font-bold tracking-wide glow-text">
-                PuzzleGenius
-              </span>
+              <Logo className="h-9 mr-1" />
             </motion.div>
           </div>
           
@@ -205,7 +203,7 @@ const Layout = () => {
       {/* Footer */}
       <footer className="py-4 text-center text-sm text-muted-foreground border-t border-border bg-card/50 backdrop-blur-sm hidden md:block">
         <div className="container">
-          <p>© {new Date().getFullYear()} PuzzleGenius AI</p>
+          <p>© {new Date().getFullYear()} AIzzle</p>
         </div>
       </footer>
     </div>
